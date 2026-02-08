@@ -63,12 +63,12 @@
 
 ### Cron-ajastukset (UTC!)
 ```cron
-# Email fetch - joka tunti :00
-0 * * * * cd /home/eetu/apps/email_manager && \
+# Email fetch - 30 min välein (tasatunnein ja puolelta)
+0,30 * * * * cd /home/eetu/apps/email_manager && \
   /home/eetu/apps/email_manager/.venv/bin/python3 fetch_mikroilmasto_emails.py
 
-# Queue processor - joka tunti :05
-5 * * * * cd /home/eetu/apps/CFD_Microclimate && \
+# Queue processor - 30 min välein (5 min jälkeen)
+5,35 * * * * cd /home/eetu/apps/CFD_Microclimate && \
   /home/eetu/apps/CFD_Microclimate/.venv/bin/python3 process_simulation_queue.py --max-tasks 1
 ```
 
@@ -108,8 +108,8 @@
 ## 📊 Workflow-tiivistelmä
 
 ```
-Google Form → Gmail → Email fetch (cron :00)
-  → Task queue JSON → Queue processor (cron :05)
+Google Form → Gmail → Email fetch (cron :00/:30)
+  → Task queue JSON → Queue processor (cron :05/:35)
   → OSM geometry → CFD simulation → Results
   → QA notification (Janne + Tuomas)
   → Approval (web link) → Customer email
