@@ -9,7 +9,7 @@ from pathlib import Path
 
 # Configuration
 PORT = 8080
-RESULTS_DIR = Path(__file__).parent / "results"
+RESULTS_DIR = Path("/srv/simulations")  # Serve customer results from /srv/simulations
 
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
