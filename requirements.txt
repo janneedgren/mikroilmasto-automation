@@ -1,0 +1,12 @@
+# CFD Mikroilmastosimulointi - Riippuvuudet
+
+# Peruskirjastot
+numpy>=1.20.0
+scipy>=1.7.0
+matplotlib>=3.4.0
+
+# Optimointi
+numba>=0.54.0
+
+# Valinnainen: Algebraic Multigrid
+# pyamg>=4.2.0

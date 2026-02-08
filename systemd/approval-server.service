@@ -1,0 +1,22 @@
+[Unit]
+Description=Mikroilmastoanalyysi Approval Server
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=eetu
+Group=eetu
+WorkingDirectory=/home/eetu/apps/CFD_Microclimate
+ExecStart=/home/eetu/apps/CFD_Microclimate/.venv/bin/python3 /home/eetu/apps/CFD_Microclimate/approval_server.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

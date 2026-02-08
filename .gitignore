@@ -1,0 +1,68 @@
+# Arkaluontoiset tiedostot
+config/email_credentials.json
+*.json.backup*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+.numba_cache/
+
+# CFD Solver ja kehitystyökalut (tulevat erillisestä reposta)
+solvers/
+turbulence_models/
+geometry/
+boundary_conditions/
+utils/
+main.py
+examples/
+tests/
+docs/
+cache/
+custom/
+
+# Vanhat skriptit ja väliaikaiset tiedostot
+adaptive_grid.py
+cleanup_processes.py
+combine_qa_results.py
+combined_visualizations.py
+compare_results.py
+*_COMPLETE.md
+RESTART_INSTRUCTIONS.txt
+QUICK_START.md
+CLOUDFLARE_SETUP.md
+test_parallel.sh
+test_parallelization.py
+nested_example.py
+"nested_grid_spatial_interp .py"
+
+# Tulokset ja väliaikaiset tiedostot
+results/
+OSMgeometry/
+*.vtk
+*.png
+*.pdf
+*.html
+editor.html
+*.zip
+
+# Lokit
+automation/logs/*.log
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

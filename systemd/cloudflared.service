@@ -1,0 +1,20 @@
+[Unit]
+Description=Cloudflare Tunnel
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=eetu
+Group=eetu
+ExecStart=/usr/bin/cloudflared --config /home/eetu/.cloudflared/config.yml tunnel run simulations
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security settings
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
