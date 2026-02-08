@@ -39,57 +39,75 @@ APPROVE_SUCCESS_TEMPLATE = """
     <title>Analyysi hyväksytty</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #F1F1F2;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            color: #071922;
+        }
+        .logo {
+            margin-bottom: 24px;
         }
         .card {
             background: white;
-            border-radius: 16px;
+            border-radius: 8px;
             padding: 48px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 500px;
-            text-align: center;
+            max-width: 460px;
+            width: 100%;
         }
-        .icon {
-            font-size: 72px;
+        .status-bar {
+            width: 48px;
+            height: 4px;
+            background: #44E3A7;
+            border-radius: 2px;
             margin-bottom: 24px;
         }
         h1 {
-            color: #2d3748;
-            margin-bottom: 16px;
-            font-size: 28px;
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0 0 24px 0;
         }
-        p {
-            color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 12px;
+        .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #6B7280;
+            margin: 0 0 4px 0;
+        }
+        .value {
+            font-size: 15px;
+            margin: 0 0 16px 0;
         }
         .meta {
-            background: #f7fafc;
-            padding: 16px;
-            border-radius: 8px;
+            border-top: 1px solid #E8E8E8;
+            padding-top: 24px;
             margin-top: 24px;
-            font-size: 14px;
-            color: #718096;
+            font-size: 13px;
+            color: #6B7280;
+            line-height: 1.6;
         }
     </style>
 </head>
 <body>
+    <img class="logo" src="https://microclimateanalysis.com/assets/loopshore-logo-dark.png" alt="Loopshore" width="180" style="width: 180px; height: auto;">
     <div class="card">
-        <div class="icon">✅</div>
-        <h1>Analyysi hyväksytty!</h1>
-        <p><strong>Asiakas:</strong> {{ task.nimi }}</p>
-        <p><strong>Osoite:</strong> {{ task.osoite }}</p>
-        <p><strong>Hyväksyjä:</strong> {{ approver }}</p>
+        <div class="status-bar"></div>
+        <h1>Analyysi hyväksytty</h1>
+        <p class="label">Asiakas</p>
+        <p class="value">{{ task.nimi }}</p>
+        <p class="label">Osoite</p>
+        <p class="value">{{ task.osoite }}</p>
+        <p class="label">Hyväksyjä</p>
+        <p class="value">{{ approver }}</p>
         <div class="meta">
-            Asiakkaalle on lähetetty automaattisesti email-ilmoitus tuloksista.<br>
-            Linkki voimassa: 30 päivää
+            Asiakkaalle on lähetetty automaattisesti linkki tuloksiin.<br>
+            Linkki voimassa 30 päivää.
         </div>
     </div>
 </body>
@@ -105,56 +123,74 @@ REJECT_SUCCESS_TEMPLATE = """
     <title>Analyysi hylätty</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #F1F1F2;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            color: #071922;
+        }
+        .logo {
+            margin-bottom: 24px;
         }
         .card {
             background: white;
-            border-radius: 16px;
+            border-radius: 8px;
             padding: 48px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 500px;
-            text-align: center;
+            max-width: 460px;
+            width: 100%;
         }
-        .icon {
-            font-size: 72px;
+        .status-bar {
+            width: 48px;
+            height: 4px;
+            background: #D1D5DB;
+            border-radius: 2px;
             margin-bottom: 24px;
         }
         h1 {
-            color: #2d3748;
-            margin-bottom: 16px;
-            font-size: 28px;
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0 0 24px 0;
         }
-        p {
-            color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 12px;
+        .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #6B7280;
+            margin: 0 0 4px 0;
+        }
+        .value {
+            font-size: 15px;
+            margin: 0 0 16px 0;
         }
         .meta {
-            background: #f7fafc;
-            padding: 16px;
-            border-radius: 8px;
+            border-top: 1px solid #E8E8E8;
+            padding-top: 24px;
             margin-top: 24px;
-            font-size: 14px;
-            color: #718096;
+            font-size: 13px;
+            color: #6B7280;
+            line-height: 1.6;
         }
     </style>
 </head>
 <body>
+    <img class="logo" src="https://microclimateanalysis.com/assets/loopshore-logo-dark.png" alt="Loopshore" width="180" style="width: 180px; height: auto;">
     <div class="card">
-        <div class="icon">❌</div>
+        <div class="status-bar"></div>
         <h1>Analyysi hylätty</h1>
-        <p><strong>Asiakas:</strong> {{ task.nimi }}</p>
-        <p><strong>Osoite:</strong> {{ task.osoite }}</p>
-        <p><strong>Hylkääjä:</strong> {{ approver }}</p>
+        <p class="label">Asiakas</p>
+        <p class="value">{{ task.nimi }}</p>
+        <p class="label">Osoite</p>
+        <p class="value">{{ task.osoite }}</p>
+        <p class="label">Hylkääjä</p>
+        <p class="value">{{ approver }}</p>
         <div class="meta">
-            Asiakkaalle EI lähetetä ilmoitusta.<br>
+            Asiakkaalle ei lähetetä ilmoitusta.<br>
             Analyysi jää sisäiseen arkistoon.
         </div>
     </div>
@@ -168,43 +204,55 @@ ERROR_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virhe</title>
+    <title>{{ title }}</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f7fafc;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #F1F1F2;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            color: #071922;
+        }
+        .logo {
+            margin-bottom: 24px;
         }
         .card {
             background: white;
-            border-radius: 16px;
+            border-radius: 8px;
             padding: 48px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 500px;
+            max-width: 460px;
+            width: 100%;
             text-align: center;
         }
-        .icon {
-            font-size: 72px;
-            margin-bottom: 24px;
+        .status-bar {
+            width: 48px;
+            height: 4px;
+            background: #D1D5DB;
+            border-radius: 2px;
+            margin: 0 auto 24px auto;
         }
         h1 {
-            color: #2d3748;
-            margin-bottom: 16px;
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0 0 16px 0;
         }
         p {
-            color: #4a5568;
+            color: #6B7280;
             line-height: 1.6;
+            margin: 0;
+            font-size: 15px;
         }
     </style>
 </head>
 <body>
+    <img class="logo" src="https://microclimateanalysis.com/assets/loopshore-logo-dark.png" alt="Loopshore" width="180" style="width: 180px; height: auto;">
     <div class="card">
-        <div class="icon">⚠️</div>
+        <div class="status-bar"></div>
         <h1>{{ title }}</h1>
         <p>{{ message }}</p>
     </div>

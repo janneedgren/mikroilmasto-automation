@@ -48,9 +48,9 @@ def send_qa_notification(task: Dict, dry_run: bool = False) -> bool:
     success = task.get("status") not in ["failed"]
 
     if success:
-        subject = f"✅ Mikroilmastoanalyysi valmis - QA tarkistus: {task['osoite'][:50]}"
+        subject = f"QA-tarkistus: {task['osoite'][:50]}"
     else:
-        subject = f"❌ Mikroilmastoanalyysi epäonnistui: {task['osoite'][:50]}"
+        subject = f"Simulaatio epäonnistui: {task['osoite'][:50]}"
 
     # Parametrit
     params = task.get("simulation_parameters", {})
@@ -85,156 +85,195 @@ def send_qa_notification(task: Dict, dry_run: bool = False) -> bool:
 
     # HTML body
     if success:
-        status_section = f"""
-        <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">Status:</td>
-            <td style="padding: 12px; border-bottom: 1px solid #eee; color: #22c55e;">✅ Onnistui</td>
-        </tr>
-        <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">Kesto:</td>
-            <td style="padding: 12px; border-bottom: 1px solid #eee;">{duration_min} minuuttia</td>
-        </tr>
-        """
+        status_row = f"""
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #6B7280; width: 140px;">Status</td>
+                                    <td style="padding: 8px 0; font-size: 14px; font-weight: 600; color: #071922;">Onnistui</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #6B7280;">Kesto</td>
+                                    <td style="padding: 8px 0; font-size: 14px; color: #071922;">{duration_min} min</td>
+                                </tr>"""
 
         action_section = f"""
-        <h2 style="color: #2c5aa0; margin-top: 32px;">📋 Toimenpide</h2>
-        <p style="margin-bottom: 16px;">Tarkista tulokset ja hyväksy tai hylkää:</p>
+                            <!-- Viiva -->
+                            <tr><td colspan="2" style="padding: 24px 0 0 0;"><div style="border-top: 1px solid #E8E8E8;"></div></td></tr>
 
-        <table style="width: 100%; margin-bottom: 24px;">
-            <tr>
-                <td style="padding: 16px; text-align: center;">
-                    <a href="{approve_url}" style="display: inline-block; background: #22c55e; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
-                        ✅ HYVÄKSYN
-                    </a>
-                </td>
-                <td style="padding: 16px; text-align: center;">
-                    <a href="{reject_url}" style="display: inline-block; background: #ef4444; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
-                        ❌ HYLKÄÄN
-                    </a>
-                </td>
-            </tr>
-        </table>
+                            <!-- Painikkeet -->
+                            <tr>
+                                <td colspan="2" style="padding: 24px 0;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="background-color: #44E3A7; border-radius: 6px; padding: 0; margin: 0;">
+                                                <a href="{approve_url}" style="display: inline-block; padding: 12px 32px; color: #071922; text-decoration: none; font-weight: 600; font-size: 14px;">HYVÄKSY</a>
+                                            </td>
+                                            <td style="width: 12px;"></td>
+                                            <td style="border: 1px solid #D1D5DB; border-radius: 6px; padding: 0; margin: 0;">
+                                                <a href="{reject_url}" style="display: inline-block; padding: 12px 32px; color: #6B7280; text-decoration: none; font-weight: 600; font-size: 14px;">HYLKÄÄ</a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
 
-        <p style="font-size: 14px; color: #666; padding: 16px; background: #f7fafc; border-radius: 8px;">
-            <strong>Huom:</strong> Jos hyväksyt, asiakkaalle lähetetään automaattisesti linkki tuloksiin.<br>
-            Linkit voimassa: {expires_str}
-        </p>
-        """
+                            <!-- Huomautus -->
+                            <tr>
+                                <td colspan="2" style="padding: 0 0 8px 0;">
+                                    <p style="font-size: 12px; color: #9CA3AF; margin: 0;">Hyväksyntä lähettää asiakkaalle automaattisesti linkin tuloksiin. Linkit voimassa {expires_str}.</p>
+                                </td>
+                            </tr>"""
     else:
-        status_section = f"""
-        <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">Status:</td>
-            <td style="padding: 12px; border-bottom: 1px solid #eee; color: #ef4444;">❌ Epäonnistui</td>
-        </tr>
-        <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">Virhe:</td>
-            <td style="padding: 12px; border-bottom: 1px solid #eee;"><pre style="margin:0; font-size:12px;">{error_msg}</pre></td>
-        </tr>
-        """
+        status_row = f"""
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #6B7280; width: 140px;">Status</td>
+                                    <td style="padding: 8px 0; font-size: 14px; font-weight: 600; color: #071922;">Epäonnistui</td>
+                                </tr>"""
+
+        error_section = f"""
+                            <!-- Virheviesti -->
+                            <tr>
+                                <td colspan="2" style="padding: 16px 0 0 0;">
+                                    <p style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #6B7280; margin: 0 0 8px 0;">Virhe</p>
+                                    <div style="background-color: #F1F1F2; padding: 12px 16px; border-radius: 4px;">
+                                        <pre style="margin: 0; font-size: 12px; font-family: 'SF Mono', Monaco, Consolas, monospace; color: #374151; white-space: pre-wrap; word-break: break-word;">{error_msg}</pre>
+                                    </div>
+                                </td>
+                            </tr>"""
 
         action_section = f"""
-        <h2 style="color: #ef4444; margin-top: 32px;">⚠️ Toimenpide tarvitaan</h2>
-        <p>Simulaatio epäonnistui. Voit hylätä tai yrittää uudelleen.</p>
+                            {error_section}
 
-        <table style="width: 100%; margin-bottom: 24px;">
-            <tr>
-                <td style="padding: 16px; text-align: center;">
-                    <a href="{reject_url}" style="display: inline-block; background: #ef4444; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
-                        ❌ HYLKÄÄ
-                    </a>
-                </td>
-            </tr>
-        </table>
-        """
+                            <!-- Viiva -->
+                            <tr><td colspan="2" style="padding: 24px 0 0 0;"><div style="border-top: 1px solid #E8E8E8;"></div></td></tr>
+
+                            <!-- Painike -->
+                            <tr>
+                                <td colspan="2" style="padding: 24px 0;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="border: 1px solid #D1D5DB; border-radius: 6px; padding: 0; margin: 0;">
+                                                <a href="{reject_url}" style="display: inline-block; padding: 12px 32px; color: #6B7280; text-decoration: none; font-weight: 600; font-size: 14px;">HYLKÄÄ</a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>"""
 
     body_html = f"""
 <html>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 700px; margin: 0 auto;">
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px; text-align: center; border-radius: 8px 8px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 28px;">Mikroilmastoanalyysi - QA Tarkistus</h1>
-    </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #F1F1F2; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #071922; line-height: 1.6;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F1F1F2;">
+        <tr>
+            <td align="center" style="padding: 24px 16px;">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
 
-    <div style="background: white; padding: 32px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
-        <h2 style="color: #2c5aa0; margin-top: 0;">👤 Asiakkaan tiedot</h2>
-        <table style="border-collapse: collapse; width: 100%; margin-bottom: 24px;">
-            <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; width: 180px;">Nimi:</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee;">{task.get('nimi', 'N/A')}</td>
-            </tr>
-            <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">Email:</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee;"><a href="mailto:{task.get('email', '')}">{task.get('email', 'N/A')}</a></td>
-            </tr>
-            <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">Osoite:</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee;">{task.get('osoite', 'N/A')}</td>
-            </tr>
-            <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">Tilattu:</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee;">{task.get('created_at', 'N/A')[:16]}</td>
-            </tr>
-        </table>
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: #F1F1F2; padding: 32px 40px 8px 40px;">
+                            <img src="https://microclimateanalysis.com/assets/loopshore-logo-dark.png" alt="Loopshore" width="180" style="display: block; width: 180px; height: auto; border: 0;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #F1F1F2; padding: 4px 40px 24px 40px;">
+                            <span style="font-size: 13px; color: #6B7280; letter-spacing: 0.5px;">QA-tarkistus</span>
+                        </td>
+                    </tr>
 
-        <h2 style="color: #2c5aa0;">⚙️ Simulaation tiedot</h2>
-        <table style="border-collapse: collapse; width: 100%; margin-bottom: 24px;">
-            {status_section}
-            <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">Hilaresolaatio:</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee;">{resolution} m</td>
-            </tr>
-            <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #eee; font-weight: bold;">WDR-analyysi:</td>
-                <td style="padding: 12px; border-bottom: 1px solid #eee;">{wdr}</td>
-            </tr>
-        </table>
+                    <!-- Content -->
+                    <tr>
+                        <td style="background-color: #FFFFFF; padding: 40px;">
+                            <!-- Status -->
+                            <p style="font-size: 18px; font-weight: 600; margin: 0 0 32px 0;">Simulaatio valmis</p>
 
-        <h2 style="color: #2c5aa0;">📊 Tulokset</h2>
-        <p style="padding: 16px; background: #f7fafc; border-radius: 8px; border-left: 4px solid #667eea;">
-            <strong>Linkki:</strong> <a href="{results_url}" style="color: #667eea;">{results_url}</a>
-        </p>
+                            <!-- Asiakas -->
+                            <p style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #6B7280; margin: 0 0 8px 0;">Asiakas</p>
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; margin: 0 0 24px 0;">
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #6B7280; width: 140px;">Nimi</td>
+                                    <td style="padding: 8px 0; font-size: 14px; color: #071922;">{task.get('nimi', 'N/A')}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #6B7280;">Email</td>
+                                    <td style="padding: 8px 0; font-size: 14px;"><a href="mailto:{task.get('email', '')}" style="color: #071922; text-decoration: underline;">{task.get('email', 'N/A')}</a></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #6B7280;">Osoite</td>
+                                    <td style="padding: 8px 0; font-size: 14px; color: #071922;">{task.get('osoite', 'N/A')}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #6B7280;">Tilattu</td>
+                                    <td style="padding: 8px 0; font-size: 14px; color: #071922;">{task.get('created_at', 'N/A')[:16]}</td>
+                                </tr>
+                            </table>
 
-        {action_section}
+                            <!-- Simulaatio -->
+                            <p style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #6B7280; margin: 0 0 8px 0;">Simulaatio</p>
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; margin: 0 0 24px 0;">
+                                {status_row}
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #6B7280;">Hilaresolaatio</td>
+                                    <td style="padding: 8px 0; font-size: 14px; color: #071922;">{resolution} m</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; font-size: 13px; color: #6B7280;">WDR-analyysi</td>
+                                    <td style="padding: 8px 0; font-size: 14px; color: #071922;">{wdr}</td>
+                                </tr>
+                            </table>
 
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
+                            <!-- Tulokset -->
+                            <p style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #6B7280; margin: 0 0 8px 0;">Tulokset</p>
+                            <p style="margin: 0 0 8px 0;"><a href="{results_url}" style="color: #44E3A7; font-size: 14px; text-decoration: underline;">{results_url}</a></p>
 
-        <p style="font-size: 12px; color: #888; text-align: center;">
-            Tämä on automaattinen ilmoitus Loopshore mikroilmastoanalyysi-järjestelmästä.
-        </p>
-    </div>
+                            {action_section}
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #F1F1F2; padding: 24px 40px; text-align: center;">
+                            <p style="margin: 0; font-size: 12px; color: #9CA3AF;">Automaattinen QA-ilmoitus &middot; Loopshore</p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
 """
 
     # Plain text fallback
-    body_text = f"""
-MIKROILMASTOANALYYSI - QA TARKISTUS
+    body_text = f"""MIKROILMASTOANALYYSI – QA-TARKISTUS
 
-ASIAKKAAN TIEDOT:
+ASIAKAS
 Nimi:     {task.get('nimi', 'N/A')}
 Email:    {task.get('email', 'N/A')}
 Osoite:   {task.get('osoite', 'N/A')}
 Tilattu:  {task.get('created_at', 'N/A')[:16]}
 
-SIMULAATION TIEDOT:
-Status:           {'✅ Onnistui' if success else '❌ Epäonnistui'}
-{'Kesto:            ' + str(duration_min) + ' min' if success else 'Virhe:            ' + error_msg}
-Hilaresolaatio:   {resolution} m
-WDR-analyysi:     {wdr}
+SIMULAATIO
+Status:         {'Onnistui' if success else 'Epäonnistui'}
+{'Kesto:          ' + str(duration_min) + ' min' if success else 'Virhe:          ' + error_msg}
+Hilaresolaatio: {resolution} m
+WDR-analyysi:   {wdr}
 
-TULOKSET:
+TULOKSET
 {results_url}
 
-TOIMENPIDE:
+TOIMENPIDE
 Hyväksy: {approve_url}
 Hylkää:  {reject_url}
 
-Linkit voimassa: {expires_str}
+Linkit voimassa {expires_str}.
+Hyväksyntä lähettää asiakkaalle automaattisesti linkin tuloksiin.
 
-Jos hyväksyt, asiakkaalle lähetetään automaattisesti linkki tuloksiin.
-
----
-Loopshore Mikroilmastoanalyysi
-Automaattinen ilmoitus
+--
+Automaattinen QA-ilmoitus / Loopshore
 """
 
     if dry_run:

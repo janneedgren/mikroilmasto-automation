@@ -12,6 +12,7 @@ Käyttö:
 """
 
 import json
+import re
 import subprocess
 import shutil
 import logging
@@ -95,6 +96,46 @@ class SimulationQueueProcessor:
         safe = safe.replace(' ', '_')
         # Rajoita pituus
         return safe[:100].strip('_')
+
+    def clean_address_for_osm(self, address: str) -> str:
+        """
+        Puhdista osoite OpenStreetMap-hakua varten poistamalla huoneistotunnukset.
+
+        Esimerkit:
+            "Hämeenkatu 13 A5 Tampere" → "Hämeenkatu 13 Tampere"
+            "Mannerheimintie 5 B 12 Helsinki" → "Mannerheimintie 5 Helsinki"
+            "Kalevankatu 3 1A Turku" → "Kalevankatu 3 Turku"
+            "Keskuskatu 10 Oulu" → "Keskuskatu 10 Oulu" (ei muutosta)
+
+        Args:
+            address: Alkuperäinen osoite (voi sisältää huoneistotunnuksen)
+
+        Returns:
+            Puhdistettu osoite ilman huoneistotunnusta
+        """
+        # Poista huoneistotunnukset eri muodoissa:
+        # 1. Kirjain + välilyönti + numerot: " A 5", " B 12"
+        cleaned = re.sub(r'\s+[A-ZÅÄÖ]\s+\d+\b', ' ', address)
+
+        # 2. Kirjain + numerot ilman välilyöntiä: " A5", " B12"
+        cleaned = re.sub(r'\s+[A-ZÅÄÖ]\d+\b', ' ', cleaned)
+
+        # 3. Porrastunnukset: " 1A", " 2B" jne.
+        cleaned = re.sub(r'\s+\d+[A-ZÅÄÖ]\b', ' ', cleaned)
+
+        # 4. Yksittäinen kirjain: " A", " B" (vain jos ei ole osa kaupungin nimeä)
+        # Tehdään tämä viimeisenä, jotta edellä olevat patternit käsittävät ensin
+        cleaned = re.sub(r'\s+[A-ZÅÄÖ]\b(?=\s)', ' ', cleaned)
+
+        # Poista ylimääräiset välilyönnit
+        cleaned = ' '.join(cleaned.split())
+
+        if cleaned != address:
+            logger.info(f"Cleaned address for OSM:")
+            logger.info(f"  Original: {address}")
+            logger.info(f"  Cleaned:  {cleaned}")
+
+        return cleaned
 
     def create_geometry_from_address(self, address: str, output_dir: Path) -> Optional[Path]:
         """
@@ -328,12 +369,15 @@ class SimulationQueueProcessor:
             simulation_output = RESULTS_BASE / safe_name / "analysis"
             customer_dir = Path(task["simulation_directory"])
 
-            # 2. Luo geometria osoitteesta
-            geometry_file = self.create_geometry_from_address(address, geometry_dir)
+            # 2. Puhdista osoite OSM-hakua varten (poista huoneistotunnukset)
+            cleaned_address = self.clean_address_for_osm(address)
+
+            # 3. Luo geometria osoitteesta
+            geometry_file = self.create_geometry_from_address(cleaned_address, geometry_dir)
             if not geometry_file:
                 raise Exception("Failed to create geometry")
 
-            # 3. Suorita CFD-simulaatio
+            # 4. Suorita CFD-simulaatio
             success = self.run_cfd_simulation(
                 geometry_file=geometry_file,
                 output_dir=simulation_output,
@@ -343,7 +387,7 @@ class SimulationQueueProcessor:
             if not success:
                 raise Exception("CFD simulation failed")
 
-            # 4. Kopioi tulokset asiakkaan hakemistoon
+            # 5. Kopioi tulokset asiakkaan hakemistoon
             success = self.copy_results_to_customer_directory(
                 simulation_output=simulation_output,
                 customer_dir=customer_dir
@@ -352,7 +396,7 @@ class SimulationQueueProcessor:
             if not success:
                 raise Exception("Failed to copy results")
 
-            # 5. Tallenna simulaation tiedot
+            # 6. Tallenna simulaation tiedot
             task["simulation_completed_at"] = datetime.now().isoformat()
 
             # Laske kesto

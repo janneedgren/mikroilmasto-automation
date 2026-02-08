@@ -57,100 +57,111 @@ def send_customer_email(task: Dict, dry_run: bool = False) -> bool:
         expires_str = "30 päivän kuluttua"
 
     # Aihe
-    subject = f"📊 Mikroilmastoanalyysisi on valmis - {address[:50]}"
+    subject = f"Mikroilmastoanalyysi valmis – {address[:50]}"
 
     # HTML body
     body_html = f"""
 <html>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 700px; margin: 0 auto;">
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px; text-align: center; border-radius: 8px 8px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 32px;">Analyysisi on valmis!</h1>
-    </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #F1F1F2; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #071922; line-height: 1.6;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F1F1F2;">
+        <tr>
+            <td align="center" style="padding: 24px 16px;">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; width: 100%;">
 
-    <div style="background: white; padding: 32px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
-        <p style="font-size: 18px; margin-top: 0;">Hei {customer_name},</p>
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: #F1F1F2; padding: 32px 40px 24px 40px;">
+                            <img src="https://microclimateanalysis.com/assets/loopshore-logo-dark.png" alt="Loopshore" width="180" style="display: block; width: 180px; height: auto; border: 0;">
+                        </td>
+                    </tr>
 
-        <p>Tilauksenne <strong>mikroilmastoanalyysi</strong> on nyt valmis!</p>
+                    <!-- Content -->
+                    <tr>
+                        <td style="background-color: #FFFFFF; padding: 40px;">
+                            <p style="font-size: 16px; margin: 0 0 20px 0;">Hei {customer_name},</p>
 
-        <div style="background: #f7fafc; padding: 24px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #667eea;">
-            <h3 style="margin-top: 0; color: #2c5aa0;">📍 Kohde</h3>
-            <p style="font-size: 16px; margin-bottom: 0;"><strong>{address}</strong></p>
-        </div>
+                            <p style="margin: 0 0 32px 0;">Tilauksenne mikroilmastoanalyysi on valmis.</p>
 
-        <div style="text-align: center; margin: 32px 0;">
-            <a href="{results_url}" style="display: inline-block; background: #667eea; color: white; padding: 16px 48px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
-                📊 Avaa tulokset
-            </a>
-        </div>
+                            <!-- Kohde -->
+                            <p style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #6B7280; margin: 0 0 6px 0;">Kohde</p>
+                            <p style="font-size: 16px; font-weight: 600; margin: 0 0 32px 0;">{address}</p>
 
-        <div style="background: #ecfdf5; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981; margin: 24px 0;">
-            <h3 style="margin-top: 0; color: #047857;">📦 Analyysi sisältää:</h3>
-            <ul style="margin: 0; padding-left: 20px;">
-                <li><strong>PDF-raportit</strong> tuulianalyysistä eri tuulensuunnista</li>
-                <li><strong>Visualisoinnit</strong> (PNG-kuvat)</li>
-                <li><strong>WDR-analyysi</strong> (kosteusrasitus julkisivuilla)</li>
-                <li><strong>QA-dashboardit</strong> (HTML)</li>
-            </ul>
-        </div>
+                            <!-- CTA Button -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 0 32px 0;">
+                                <tr>
+                                    <td style="background-color: #44E3A7; border-radius: 6px;">
+                                        <a href="{results_url}" style="display: inline-block; padding: 14px 40px; color: #071922; text-decoration: none; font-weight: 600; font-size: 15px;">Avaa tulokset</a>
+                                    </td>
+                                </tr>
+                            </table>
 
-        <div style="background: #fef3c7; padding: 16px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #f59e0b;">
-            <p style="margin: 0; font-size: 14px;">
-                <strong>⏳ Linkki voimassa:</strong> {expires_str}<br>
-                Suosittelemme lataamaan tiedostot omalle koneellesi.
-            </p>
-        </div>
+                            <!-- Sisältölista -->
+                            <p style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #6B7280; margin: 0 0 10px 0;">Analyysi sisältää</p>
+                            <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 0 32px 0;">
+                                <tr><td style="padding: 3px 0; color: #374151; font-size: 14px;">&#8226;&ensp;PDF-raportit tuulianalyysistä eri tuulensuunnista</td></tr>
+                                <tr><td style="padding: 3px 0; color: #374151; font-size: 14px;">&#8226;&ensp;Visualisoinnit (PNG-kuvat)</td></tr>
+                                <tr><td style="padding: 3px 0; color: #374151; font-size: 14px;">&#8226;&ensp;WDR-analyysi (kosteusrasitus julkisivuilla)</td></tr>
+                                <tr><td style="padding: 3px 0; color: #374151; font-size: 14px;">&#8226;&ensp;QA-dashboardit (HTML)</td></tr>
+                            </table>
 
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
+                            <!-- Voimassaolo -->
+                            <p style="font-size: 13px; color: #6B7280; margin: 0 0 32px 0;">
+                                Linkki voimassa {expires_str}. Suosittelemme lataamaan tiedostot omalle koneellesi.
+                            </p>
 
-        <p style="margin-bottom: 8px;">Ystävällisin terveisin,</p>
-        <p style="font-weight: bold; margin: 0;">Loopshore</p>
-        <p style="font-size: 14px; color: #666; margin-top: 4px;">
-            <a href="https://www.loopshore.fi" style="color: #667eea;">www.loopshore.fi</a>
-        </p>
+                            <!-- Allekirjoitus -->
+                            <div style="border-top: 1px solid #E8E8E8; padding-top: 24px; margin-top: 8px;">
+                                <p style="margin: 0 0 4px 0; font-size: 14px;">Ystävällisin terveisin,</p>
+                                <p style="margin: 0; font-size: 14px; font-weight: 600;">Loopshore</p>
+                            </div>
+                        </td>
+                    </tr>
 
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #F1F1F2; padding: 24px 40px; text-align: center;">
+                            <p style="margin: 0 0 4px 0; font-size: 12px; color: #6B7280;">Loopshore Oy</p>
+                            <p style="margin: 0 0 12px 0; font-size: 12px; color: #9CA3AF;">Tämä on automaattinen ilmoitus. Jos sinulla on kysyttävää, vastaa tähän emailiin.</p>
+                        </td>
+                    </tr>
 
-        <p style="font-size: 12px; color: #888; text-align: center;">
-            Tämä on automaattinen ilmoitus Loopshore mikroilmastoanalyysi-palvelusta.<br>
-            Jos sinulla on kysyttävää, vastaa tähän emailiin.
-        </p>
-    </div>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
 """
 
     # Plain text fallback
-    body_text = f"""
-MIKROILMASTOANALYYSISI ON VALMIS!
+    body_text = f"""Hei {customer_name},
 
-Hei {customer_name},
+Tilauksenne mikroilmastoanalyysi on valmis.
 
-Tilauksenne mikroilmastoanalyysi on nyt valmis!
-
-KOHDE:
+KOHDE
 {address}
 
-TULOKSET:
+TULOKSET
 {results_url}
 
-ANALYYSI SISÄLTÄÄ:
-• PDF-raportit tuulianalyysistä eri tuulensuunnista
-• Visualisoinnit (PNG-kuvat)
-• WDR-analyysi (kosteusrasitus julkisivuilla)
-• QA-dashboardit (HTML)
+ANALYYSI SISÄLTÄÄ
+- PDF-raportit tuulianalyysistä eri tuulensuunnista
+- Visualisoinnit (PNG-kuvat)
+- WDR-analyysi (kosteusrasitus julkisivuilla)
+- QA-dashboardit (HTML)
 
-LINKKI VOIMASSA:
-{expires_str}
-
-Suosittelemme lataamaan tiedostot omalle koneellesi.
+Linkki voimassa {expires_str}. Suosittelemme lataamaan tiedostot omalle koneellesi.
 
 Ystävällisin terveisin,
 Loopshore
-www.loopshore.fi
 
----
-Tämä on automaattinen ilmoitus Loopshore mikroilmastoanalyysi-palvelusta.
-Jos sinulla on kysyttävää, vastaa tähän emailiin.
+--
+Loopshore Oy
+Tämä on automaattinen ilmoitus. Jos sinulla on kysyttävää, vastaa tähän emailiin.
 """
 
     if dry_run:
