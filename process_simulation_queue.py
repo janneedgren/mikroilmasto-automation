@@ -320,6 +320,42 @@ class SimulationQueueProcessor:
             logger.error(f"Failed to send QA notification: {e}")
             return False
 
+    def clean_caches(self, geometry_dir: Path, simulation_output: Path) -> None:
+        """
+        Siivoa edellisten ajojen jäänteet ennen uutta simulaatiota.
+
+        Poistaa:
+        1. osmnx Overpass API cache (./cache/) - estää vanhan geometrian käytön
+        2. Edellisen ajon geometria samalle osoitteelle
+        3. Edellisen ajon simulaatiotulokset samalle osoitteelle
+        4. Numba ja Python __pycache__ -hakemistot (solvers, geometry)
+        """
+        if self.dry_run:
+            logger.info("[DRY-RUN] Would clean caches")
+            return
+
+        # 1. osmnx Overpass API cache
+        osmnx_cache = SCRIPT_DIR / "cache"
+        if osmnx_cache.exists():
+            shutil.rmtree(osmnx_cache)
+            logger.info(f"Cleaned osmnx cache: {osmnx_cache}")
+
+        # 2. Edellisen ajon geometria samalle osoitteelle
+        if geometry_dir.exists():
+            shutil.rmtree(geometry_dir)
+            logger.info(f"Cleaned old geometry: {geometry_dir}")
+
+        # 3. Edellisen ajon tulokset samalle osoitteelle
+        if simulation_output.exists():
+            shutil.rmtree(simulation_output)
+            logger.info(f"Cleaned old simulation output: {simulation_output}")
+
+        # 4. Python/Numba __pycache__ hakemistot (vain projektin omat)
+        for cache_dir in SCRIPT_DIR.rglob("__pycache__"):
+            if ".venv" not in str(cache_dir):
+                shutil.rmtree(cache_dir)
+        logger.info("Cleaned __pycache__ directories")
+
     def process_task(self, task: Dict) -> bool:
         """
         Prosessoi yksi tehtävä: luo geometria, suorita simulaatio, kopioi tulokset.
@@ -368,6 +404,9 @@ class SimulationQueueProcessor:
             geometry_dir = OSM_GEOMETRY_DIR / safe_name
             simulation_output = RESULTS_BASE / safe_name / "analysis"
             customer_dir = Path(task["simulation_directory"])
+
+            # 1b. Siivoa edellisten ajojen jäänteet (estää tulosten sekoittumisen)
+            self.clean_caches(geometry_dir, simulation_output)
 
             # 2. Puhdista osoite OSM-hakua varten (poista huoneistotunnukset)
             cleaned_address = self.clean_address_for_osm(address)
